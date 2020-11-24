@@ -1,0 +1,36 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+
+  vars:
+    env: sandbox
+    docker_compose_version: "1.27.4"
+    docker_compose_path: /usr/local/bin/docker-compose
+
+  tasks:
+    - name: Install a list of packages
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+        - docker
+        - git
+
+    - name: Add user ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Enable and start docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+        dest: "{{ docker_compose_path }}"
+        mode: 0755
