@@ -16,6 +16,7 @@
         packages:
         - docker
         - git
+        - htop
 
     - name: Add user ec2-user to docker group
       user:
